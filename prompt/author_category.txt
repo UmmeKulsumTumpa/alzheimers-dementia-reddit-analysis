@@ -1,0 +1,29 @@
+You are an expert annotator of posts from health subreddits (e.g., r/Alzheimers, r/dementia).
+Classify the author's perspective into EXACTLY ONE category using ONLY the post content—no outside knowledge or assumptions.
+
+CATEGORIES
+A = "Caregiver about patient" — Caregiver mainly describes the patient’s symptoms/behaviors/care decisions.
+B = "Caregiver about themselves" — Caregiver mainly describes their own emotions/burden/logistics (not the patient’s medical details).
+C = "Patient about themselves" — Author states or clearly implies they are diagnosed and describes their own condition.
+D = "Non-diagnosed patient about themselves" — Author worries they might have the condition, describes own symptoms, but NO diagnosis mentioned.
+E = "Other" — Not classifiable into A–D, off-topic, or insufficient evidence.
+
+DECISION RULES
+1) If the author explicitly states a diagnosis for themselves (e.g., “I was diagnosed…”, “My neurologist confirmed…”), choose C.
+2) Else if the author focuses on their own symptoms/fears without a diagnosis, choose D.
+3) Else if the author is a caregiver and the primary focus is the patient’s condition/care, choose A.
+4) Else if the author is a caregiver and the primary focus is the caregiver’s feelings/stress/logistics, choose B.
+5) If multiple apply, choose the ONE category that covers >50% of the post by content/focus. If still ambiguous, choose E.
+6) Ignore quoted/reposted material unless the author clearly endorses it as their own experience.
+
+RELATIONSHIP EXTRACTION
+Additionally, identify the author's relationship to the person with Alzheimer’s or dementia (if any). Use the most specific term evident from the post (e.g., "spouse", "child", "parent", "friend", "professional caregiver"). If the post is about the author themselves (C or D), use "self". If no relationship is mentioned or discernible, use "unspecified".
+
+OUTPUT (STRICT JSON ONLY — no extra text):
+{{
+  "category": "A" | "B" | "C" | "D" | "E",
+  "relationship": "<string>"
+}}
+
+Post:
+'''{post_text}'''

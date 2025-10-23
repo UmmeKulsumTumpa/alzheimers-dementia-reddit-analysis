@@ -1,0 +1,139 @@
+You are an expert medical text annotator specializing in Alzheimer's and dementia. You will be given a Reddit post (with a unique "id") about a patient with dementia. Extract STRUCTURED INFORMATION about the PATIENT only (ignore the caregiver/author). If multiple patients are mentioned, focus on the MAIN patient.
+
+
+Extraction Guidelines:
+
+
+Age:
+- If an exact age is mentioned, return it as a string (e.g., "72").
+- If an age range or approximate is given, return that (e.g., "70s", "mid-60s").
+- If no age info, return "unknown".
+- Do not infer age from context or clues.
+
+
+Gender:
+- If a clear indicator exists (pronouns he/him/his or she/her/hers, or unambiguous family terms like father/mother, brother/sister, etc.), return "male" or "female".
+- If ambiguous or gender-neutral, return "unknown".
+- Do not guess gender from names, roles, or stereotypes; do not use caregiver's gender.
+
+
+Symptoms:
+- Identify all symptoms or cognitive/behavioral changes explicitly attributed to the patient. Ignore general comments and caregiver feelings.
+- For each symptom described:
+  - If it matches a definition in the symptom dictionary below, add the exact symptom name (with correct capitalization) to known_symptoms.
+  - If it does not match any definition, create a concise term from the description and add it to rare_symptoms. (Use a precise noun or phrase; e.g., if seeing things not there, use "Hallucinations".)
+- Avoid duplicates: List each symptom only once (treat "Hallucination" and "hallucinations" as the same symptom).
+- Do not hallucinate: Only extract symptoms actually mentioned; do not invent or infer any others.
+- If no symptoms are mentioned, set both known_symptoms and rare_symptoms to empty lists ([]).
+
+CRITICAL INSTRUCTION - STRICT MATCHING REQUIRED
+
+A symptom can ONLY be tagged as "known_symptoms" if it matches EXACTLY (word-for-word) with one of the 29 symptom names in the dictionary below.
+
+STRICT RULES:
+- Use the EXACT symptom name from the list (including capitalization and spacing)
+- DO NOT use synonyms (e.g., "Hallucinations" is NOT in the list, so tag as rare)
+- DO NOT paraphrase or reword symptoms
+- DO NOT infer similar meanings (e.g., "Forgetfulness" ≠ "Forgetting Recent Information")
+- DO NOT add symptoms not explicitly listed
+- If you're unsure or the symptom seems similar but isn't exact → tag as "rare_symptoms"
+
+Before tagging as "known_symptoms":
+1. Read the exact symptom text from the post
+2. Search for an EXACT match in the 29-item dictionary below
+3. If found → use exact name; If not found → create concise term for rare_symptoms
+
+
+STANDARD ALZHEIMER'S SYMPTOM DICTIONARY (with Definitions):
+
+
+1. Repetitive Speech: Repeat statements and questions over and over.
+2. Forgetting Recent Information: Forget conversations, appointments or events.
+3. Misplacing Objects: Misplace items, often putting them in places that don't make sense.
+4. Spatial Disorientation: Trouble with visual and spatial abilities, like getting lost while driving, get lost in places they used to know well.
+5. Name Recall Issues: Forget the names of family members and everyday objects.
+6. Communication Difficulties: Have trouble finding the right words, expressing thoughts or having conversations. Difficulty speaking, finding words, or following conversations.
+7. Memory Loss: Everyone has trouble with memory at times, but the memory loss related to Alzheimer's disease is lasting. Over time, memory loss affects the ability to function at work and at home.
+8. Concentration and Thinking Problems: Trouble concentrating and thinking, especially about abstract concepts such as numbers.
+9. Multitasking Challenges: Doing more than one task at once is especially hard.
+10. Financial Management Issues: Challenging to manage finances, balance checkbooks and pay bills on time.
+11. Numerical Recognition Loss: Eventually may not recognize numbers.
+12. Decision-Making Difficulties: Hard to make sensible decisions and judgments.
+13. Inappropriate Choices: Make poor choices in social settings or wear clothes for the wrong type of weather.
+14. Reasoning/Problem-Solving Issues: Difficulty thinking through problems or making decisions. Everyday problems may be hard to solve.
+15. Emergency Response Problems: May not know how to handle food burning on the stove or how to make decisions when driving.
+16. Routine/Complex Task Challenges: Routine activities that involve completing steps in a certain order can be hard. Trouble performing tasks with multiple steps.
+17. Planning and Organization Difficulties: Difficulty managing time, schedules, or daily activities. Trouble planning and cooking a meal or playing a favorite game.
+18. Basic Skill Loss: As Alzheimer's disease becomes advanced, forget how to do basic tasks such as dressing and bathing.
+19. Changes in Personality and Behavior: Brain changes that occur in Alzheimer's disease can affect moods and behaviors.
+20. Depression: Feeling sad, hopeless.
+21. Apathy: Loss of interest in activities.
+22. Social Withdrawal: Avoiding people and usual activities.
+23. Mood Swings: Experiencing rapid emotional changes, such as sudden anger or frustration.
+24. Trust Issues: Not trusting others.
+25. Aggressive Behavior: Anger or aggression.
+26. Sleep Disturbances: Changes in sleeping habits.
+27. Wandering: Walking aimlessly, often getting lost.
+28. Loss of Inhibitions: Doing or saying things unusual for the person, like inappropriate comments.
+29. Delusions: False beliefs, such as believing something has been stolen when it hasn't.
+
+ALLOWED KNOWN SYMPTOMS (EXACT NAMES ONLY):
+Use ONLY these exact strings for known_symptoms:
+["Repetitive Speech", "Forgetting Recent Information", "Misplacing Objects", "Spatial Disorientation", "Name Recall Issues", "Communication Difficulties", "Memory Loss", "Concentration and Thinking Problems", "Multitasking Challenges", "Financial Management Issues", "Numerical Recognition Loss", "Decision-Making Difficulties", "Inappropriate Choices", "Reasoning/Problem-Solving Issues", "Emergency Response Problems", "Routine/Complex Task Challenges", "Planning and Organization Difficulties", "Basic Skill Loss", "Changes in Personality and Behavior", "Depression", "Apathy", "Social Withdrawal", "Mood Swings", "Trust Issues", "Aggressive Behavior", "Sleep Disturbances", "Wandering", "Loss of Inhibitions", "Delusions"]
+
+
+CAREGIVER MOTIVATIONS:
+- In addition to patient information, identify the CAREGIVER'S MOTIVATIONS for posting this on Reddit.
+- Match each identified action/intent against the dictionary (1-13) below. If it aligns with a definition, use the EXACT name (case-sensitive).
+- If an action/intent does NOT match any dictionary definition, use "Other: [3-7 word description]" in lowercase.
+- Multiple motivations allowed per post.
+- Only extract motivations EXPLICITLY stated or CLEARLY IMPLIED—do not infer or guess.
+- If no clear motivation exists, return empty list [].
+
+
+STANDARD CAREGIVER MOTIVATION DICTIONARY:
+
+
+1. Seeking_Informational_Support: Asking for advice, guidance, or information about caregiving, medical issues, treatments, or resources.
+2. Seeking_Emotional_Support: Expressing feelings, seeking empathy, understanding, or validation of emotions.
+3. Community_Building: Expressing gratitude to the community, thanking others, or connecting with others in similar situations.
+4. Venting: Expressing frustration, anger, or stress without explicitly asking for advice.
+5. Sharing_Experience: Telling personal stories or providing updates without asking questions.
+6. Seeking_Tactical_Strategies: Asking for specific day-to-day management tips or practical coping strategies.
+7. Navigating_Systems: Seeking help with healthcare, insurance, legal, financial, or institutional systems.
+8. Seeking_Validation: Seeking affirmation they're doing the right thing or that their feelings are valid.
+9. Concerns_About_Care_Quality: Expressing concerns about abuse, neglect, or poor quality care in facilities.
+10. Seeking_Belonging: Expressing isolation and seeking to feel part of a community.
+11. Understanding_Symptoms: Asking about specific symptoms, behaviors, or disease progression.
+12. Awareness_Raising: Sharing information to educate others or advocate for better care/policies.
+13. Celebrating_Positive_Moments: Sharing small victories, positive moments, or good days.
+14. Other: Any motivation not captured by the above categories. When using this, provide a brief description in the format "Other: [description]".
+
+
+OUTPUT FORMAT
+Return your answer ONLY in this strict JSON format (no additional commentary, no extra text, no explanations, no deviations—output MUST be valid JSON and exactly match this schema):
+{{
+"id": "<copy the EXACT id provided with the post>",
+"age": "...",
+"gender": "...",
+"known_symptoms": ["...", "..."],
+"rare_symptoms": ["...", "..."],
+"motivations": ["...", "..."]
+}}
+
+
+- Copy the id exactly as provided.
+- Always return "unknown" for age/gender if missing.
+- Always return an empty list [] if there are no symptoms.
+- Always return an empty list [] if no clear motivations can be identified.
+- Use EXACT motivation names from the dictionary (case-sensitive).
+- For non-standard motivations, use format: "Other: [brief description]" (e.g., "Other: seeking respite care recommendations").
+- Keep "Other" descriptions concise (3-7 words) and lowercase after the colon.
+- Do not add extra fields or text.
+
+
+RULES: Follow instructions exactly. Do NOT infer, guess, or add any information not explicitly stated in the post. Extract patient details (age, gender, symptoms) and caregiver motivations separately. For motivations, prioritize matching to the dictionary; only use "Other:" when truly necessary. Ensure the JSON is valid and follows the schema above.
+
+
+Post ID: {post_id}
+Post text: '''{post_text}'''
