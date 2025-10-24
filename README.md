@@ -4,7 +4,7 @@ Project: Alzheimer & Dementia Reddit Analysis (Data Collection + Annotations)
 
 Brief
 -----
-This repository contains the data, notebooks, and prompts used to collect and annotate Reddit posts from the r/Alzheimer and r/dementia subreddits (2010 — Jul 2025). The analysis produced: (1) a scraped dataset (CSV), (2) a first-level author-type categorization (Qwen-14B, zero-shot), and (3) a focused second-level annotation for the "Caregiver about patient" class (GPT-4o) extracting demographics, symptoms and caregiver motivations.
+This repository contains the notebooks and prompts used to collect and annotate Reddit posts from the r/Alzheimer and r/dementia subreddits (2010 — Jul 2025). The analysis produced: (1) a scraped dataset (CSV) — note that raw scraped social-media posts are not included in this repository for confidentiality and privacy reasons, (2) a first-level author-type categorization (Qwen-14B, zero-shot), and (3) a focused second-level annotation for the "Caregiver about patient" class (GPT-4o) extracting demographics, symptoms and caregiver motivations. The LLM-derived annotation CSVs are provided in the `extracted-results/` directory and the scraping code is included in `code/` so the full pipeline can be reproduced by researchers who can lawfully and ethically perform the scrape.
 
 Repository layout
 -----------------
@@ -12,7 +12,7 @@ Repository layout
   - `1_data_scraping.ipynb` — data collection and CSV export (arctic-shift photon Reddit query)
   - `2_author_categorization.ipynb` — preprocessing and author-type categorization using Qwen-14B with zero-shot prompts
   - `3_demographic_extraction.ipynb` — focused annotation on "Caregiver about patient" posts using GPT-4o; extracts age, gender, symptoms, motivation and writes CSV outputs
-- `data/` — scraped CSV files (raw and cleaned versions) and the 2-level annotation CSVs (first-level categories and second-level caregiver annotations)
+- `extracted-results/` — LLM-derived annotation CSVs (first-level author categorization and second-level caregiver demographic extraction)
 - `prompt/` — prompt templates used for zero-shot categorization and demographic extraction (`author_category.txt`, `demographic.txt`)
 
 Goals
@@ -29,8 +29,8 @@ Prerequisites
 
 Steps
 1. Open Google Colab and upload or open the notebook from this repository. Recommended order:
-	- `code/1_data_scraping.ipynb` — run to scrape (or skip if you will use the provided `data/` CSVs).
-	- `code/2_author_categorization.ipynb` — run preprocessing and first-level categorization. This notebook expects the raw/clean CSV in `data/` or an uploaded file with matching column names (`post_id`, `created_utc`, `author`, `title`, `selftext`, ...).
+	- `code/1_data_scraping.ipynb` — run to scrape data (this repository does not include raw scraped social-media posts; run the scraper only if you have the necessary permissions and ethical approvals). If you prefer not to re-run scraping, use the provided LLM-extracted outputs in `extracted-results/`.
+	- `code/2_author_categorization.ipynb` — run preprocessing and first-level categorization. This notebook expects the raw/clean CSV in `data/` or an uploaded file with matching column names (`post_id`, `created_utc`, `author`, `title`, `selftext`, ...). When using the provided extracted outputs, adapt input loading to point to `extracted-results/` instead of `data/`.
 	- `code/3_demographic_extraction.ipynb` — run focused second-level annotation on the `Caregiver about patient` subset produced by notebook
 
 Notes on models & prompts
@@ -41,8 +41,11 @@ Notes on models & prompts
 
 Data & outputs
 ---------------
-- The `data/` folder includes the raw scraped CSV(s), cleaned CSV(s), first-level category CSV, and second-level caregiver annotation CSV. Filenames and example columns are described at the top of each notebook.
-- When publishing the dataset, remove or mask direct user identifiers according to platform policies (see Ethical & privacy section below).
+- Raw scraped social-media posts are not published in this repository due to confidentiality and privacy considerations. Instead, we provide the processed, LLM-derived annotation outputs in the `extracted-results/` directory:
+	- `extracted-results/author-categorization-dataset/` — first-level author categorization CSVs (Qwen-14B outputs)
+	- `extracted-results/demographic-extraction-dataset/` — second-level caregiver annotation CSVs (GPT-4o outputs)
+
+	The `code/1_data_scraping.ipynb` notebook implements the scraper used to collect the raw posts; it is included so that others can reproduce the data collection step where permitted. When reproducing the scraping step, please follow Reddit's API terms, any applicable institutional review board (IRB) requirements, and privacy best practices (e.g., de-identification, masking user identifiers) before sharing or publishing collected data.
 
 Ethics, privacy, and licensing
 -----------------------------
